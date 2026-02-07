@@ -42,7 +42,8 @@ const LeadModal: React.FC<LeadModalProps> = ({ isOpen, onClose }) => {
                 data = JSON.parse(text);
             } catch (e) {
                 console.error('Failed to parse JSON response:', text);
-                throw new Error('Our server is having a moment. Please try again later.');
+                // Throw the raw text so we can see if it is 404 HTML or 500 HTML
+                throw new Error(`Server error (${response.status}): ${text.substring(0, 200)}...`);
             }
 
             if (!response.ok) {
