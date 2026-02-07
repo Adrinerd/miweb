@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import DigestiveSystem from './DigestiveSystem';
 import { ArrowRight, BookOpen } from 'lucide-react';
+import LeadModal from './LeadModal';
 
 const Hero: React.FC = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <section id="hero" className="relative min-h-screen pt-24 pb-12 overflow-hidden flex items-center">
 
@@ -29,7 +32,10 @@ const Hero: React.FC = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <button className="group relative px-8 py-4 bg-slate-900 text-white font-medium rounded-lg overflow-hidden transition-all hover:shadow-2xl hover:-translate-y-1">
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="group relative px-8 py-4 bg-slate-900 text-white font-medium rounded-lg overflow-hidden transition-all hover:shadow-2xl hover:-translate-y-1"
+            >
               <span className="relative z-10 flex items-center gap-2">
                 Get The Blueprint
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -50,6 +56,8 @@ const Hero: React.FC = () => {
           <DigestiveSystem />
         </div>
       </div>
+
+      <LeadModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </section>
   );
 };
