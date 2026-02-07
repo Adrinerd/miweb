@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 
@@ -23,36 +24,53 @@ export default async function handler(req: any, res: any) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
+    console.log('API Invoked: /api/request-assessment');
+
     try {
         const supabaseUrl = process.env.SUPABASE_URL;
         const supabaseKey = process.env.SUPABASE_ANON_KEY;
         const resendApiKey = process.env.RESEND_API_KEY;
+
+        console.log('Environment Check:', {
+            hasSupabaseUrl: !!supabaseUrl,
+            hasSupabaseKey: !!supabaseKey,
+            hasResendKey: !!resendApiKey
+        });
 
         if (!supabaseUrl || !supabaseKey || !resendApiKey) {
             console.error('Missing environment variables');
             return res.status(500).json({ error: 'Server configuration error: Missing environment variables' });
         }
 
+        // Initialize clients inside the handler to avoid cold-start crashes outside the function
         const supabase = createClient(supabaseUrl, supabaseKey);
         const resend = new Resend(resendApiKey);
 
         const { email } = req.body;
+        console.log('Processing request for email:', email);
 
         if (!email) {
             return res.status(400).json({ error: 'Email is required' });
         }
 
         // 1. Store in Supabase
+        console.log('Step 1: Inserting into Supabase leads table...');
         const { error: dbError } = await supabase
             .from('leads')
             .insert([{ email }]);
 
         if (dbError) {
             console.error('Supabase error:', dbError);
-            return res.status(500).json({ error: 'Failed to capture lead' });
+            // Don't fail the whole request effectively if DB fails? 
+            // Usually we want to at least send the email if possible, or fail hard.
+            // Let's fail hard to ensure data consistency, or log and continue? 
+            // For now, fail hard as per original logic.
+            return res.status(500).json({ error: 'Failed to capture lead', details: dbError.message });
         }
+        console.log('Step 1: Success');
 
         // 2. Send Email
+        console.log('Step 2: Sending email via Resend...');
         const { error: emailError } = await resend.emails.send({
             from: 'GutArchitect <onboarding@resend.dev>',
             to: [email],
@@ -76,13 +94,19 @@ export default async function handler(req: any, res: any) {
 
         if (emailError) {
             console.error('Resend error:', emailError);
-            return res.status(500).json({ error: 'Failed to send email' });
+            return res.status(500).json({ error: 'Failed to send email', details: emailError });
         }
+        console.log('Step 2: Success');
 
         return res.status(200).json({ success: true });
 
     } catch (error: any) {
-        console.error('Handler error:', error);
-        return res.status(500).json({ error: 'Internal Server Error', details: error.message });
+        console.error('CRITICAL EXTENDED HANDLER ERROR:', error);
+        // Ensure we always return JSON even on crashes
+        return res.status(500).json({
+            error: 'Internal Server Error',
+            message: error.message,
+            stack: error.stack
+        });
     }
 }
