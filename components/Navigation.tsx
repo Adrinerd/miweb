@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 
-const Navigation: React.FC = () => {
+interface NavigationProps {
+  onOpenAssessment: () => void;
+}
+
+const Navigation: React.FC<NavigationProps> = ({ onOpenAssessment }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -42,7 +46,7 @@ const Navigation: React.FC = () => {
 
         {/* CTA */}
         <div className="hidden md:block">
-          <button onClick={() => scrollTo('assessment')} className="px-6 py-2.5 bg-slate-900 text-white text-sm font-medium rounded-full hover:bg-slate-800 transition-all hover:shadow-lg hover:-translate-y-0.5 border border-transparent">
+          <button onClick={onOpenAssessment} className="px-6 py-2.5 bg-slate-900 text-white text-sm font-medium rounded-full hover:bg-slate-800 transition-all hover:shadow-lg hover:-translate-y-0.5 border border-transparent">
             Start Root Cause Assessment
           </button>
         </div>
@@ -61,7 +65,7 @@ const Navigation: React.FC = () => {
           <button onClick={() => scrollTo('methodology')} className="text-left text-slate-700 py-2">Methodology</button>
           <Link to="/knowledge-base" onClick={() => setMobileMenuOpen(false)} className="text-left text-slate-700 py-2">Knowledge Base</Link>
           <button onClick={() => scrollTo('blueprint')} className="text-left text-slate-700 py-2 font-bold">SIBO Recovery Framework</button>
-          <button onClick={() => scrollTo('assessment')} className="w-full text-center py-3 bg-slate-900 text-white rounded-lg">Start Assessment</button>
+          <button onClick={() => { setMobileMenuOpen(false); onOpenAssessment(); }} className="w-full text-center py-3 bg-slate-900 text-white rounded-lg">Start Assessment</button>
         </div>
       )}
     </nav>

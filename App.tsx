@@ -10,14 +10,26 @@ import Footer from './components/Footer';
 import ExitPopup from './components/ExitPopup';
 import KnowledgeBasePage from './pages/KnowledgeBasePage';
 
+import LeadModal from './components/LeadModal';
+
 // Home page component (main landing page)
 const HomePage: React.FC = () => {
+  const [isLeadModalOpen, setIsLeadModalOpen] = React.useState(false);
+
+  const handleOpenLeadModal = () => {
+    setIsLeadModalOpen(true);
+  };
+
+  const handleCloseLeadModal = () => {
+    setIsLeadModalOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-stone-50 font-sans selection:bg-accent selection:text-white">
-      <Navigation />
+      <Navigation onOpenAssessment={handleOpenLeadModal} />
 
       <main>
-        <Hero />
+        <Hero onOpenAssessment={handleOpenLeadModal} />
         <SocialProof />
         <Methodology />
         <ProductPage />
@@ -26,6 +38,7 @@ const HomePage: React.FC = () => {
 
       <Footer />
       <ExitPopup />
+      <LeadModal isOpen={isLeadModalOpen} onClose={handleCloseLeadModal} />
     </div>
   );
 };
