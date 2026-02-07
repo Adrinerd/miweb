@@ -1,5 +1,6 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { X, Mail, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
 
 interface LeadModalProps {
@@ -11,8 +12,14 @@ const LeadModal: React.FC<LeadModalProps> = ({ isOpen, onClose }) => {
     const [email, setEmail] = useState('');
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
     const [errorMessage, setErrorMessage] = useState('');
+    const [mounted, setMounted] = useState(false);
 
-    if (!isOpen) return null;
+    useEffect(() => {
+        setMounted(true);
+        return () => setMounted(false);
+    }, []);
+
+    if (!isOpen || !mounted) return null;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -50,8 +57,8 @@ const LeadModal: React.FC<LeadModalProps> = ({ isOpen, onClose }) => {
         onClose();
     }
 
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    return ReactDOM.createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
@@ -140,7 +147,8 @@ const LeadModal: React.FC<LeadModalProps> = ({ isOpen, onClose }) => {
                     </>
                 )}
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 
