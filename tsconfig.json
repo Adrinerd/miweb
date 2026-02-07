@@ -13,7 +13,9 @@
     "types": [
       "node"
     ],
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "isolatedModules": true,
     "moduleDetection": "force",
     "allowJs": true,
@@ -23,7 +25,9 @@
         "./*"
       ]
     },
-    "allowImportingTsExtensions": true,
     "noEmit": true
-  }
+  },
+  "exclude": [
+    "api"
+  ]
 }
