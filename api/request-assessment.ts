@@ -1,11 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 
-// Initialize clients outside of handler for caching
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
-const resendApiKey = process.env.RESEND_API_KEY;
-
+// Initialize inside handler for safety
 const PDF_URL = 'https://bawxawmhjsllrmtadtmd.supabase.co/storage/v1/object/public/gut%20architect/GutArchitect%20Root%20Cause%20Analysis.pdf';
 
 export default async function handler(req: any, res: any) {
@@ -28,9 +24,13 @@ export default async function handler(req: any, res: any) {
     }
 
     try {
+        const supabaseUrl = process.env.SUPABASE_URL;
+        const supabaseKey = process.env.SUPABASE_ANON_KEY;
+        const resendApiKey = process.env.RESEND_API_KEY;
+
         if (!supabaseUrl || !supabaseKey || !resendApiKey) {
             console.error('Missing environment variables');
-            return res.status(500).json({ error: 'Server configuration error' });
+            return res.status(500).json({ error: 'Server configuration error: Missing environment variables' });
         }
 
         const supabase = createClient(supabaseUrl, supabaseKey);
