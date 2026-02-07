@@ -35,16 +35,25 @@ const LeadModal: React.FC<LeadModalProps> = ({ isOpen, onClose }) => {
                 body: JSON.stringify({ email }),
             });
 
-            const data = await response.json();
+            // Check content type or try to parse text first if not ok
+            const text = await response.text();
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                console.error('Failed to parse JSON response:', text);
+                throw new Error(`Server error: ${text.substring(0, 100)}...`);
+            }
 
             if (!response.ok) {
-                throw new Error(data.error || 'Something went wrong');
+                throw new Error(data.error || `Error ${response.status}: ${data.message || 'Something went wrong'}`);
             }
 
             setStatus('success');
         } catch (error: any) {
             console.error('Submission error:', error);
             setStatus('error');
+            // Show a cleaner error message to the user
             setErrorMessage(error.message || 'Failed to send request. Please try again.');
         }
     };
