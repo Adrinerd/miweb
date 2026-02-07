@@ -42,7 +42,7 @@ const LeadModal: React.FC<LeadModalProps> = ({ isOpen, onClose }) => {
                 data = JSON.parse(text);
             } catch (e) {
                 console.error('Failed to parse JSON response:', text);
-                throw new Error(`Server error: ${text.substring(0, 100)}...`);
+                throw new Error('Our server is having a moment. Please try again later.');
             }
 
             if (!response.ok) {
